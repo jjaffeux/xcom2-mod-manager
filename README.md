@@ -7,7 +7,7 @@ If you have XCom2 for OSX, you might have noticed that mods don't work well, or 
 
 This is an attempt to simplify enabling/disabling mods. Simply start this mod manager and check/uncheck mods to immediately enable/disable them in your mod config.
 
-This has been tested on my machine only; source is included. Requires rubymotion to build for yourself.
+This has been tested on my machine only; source is included. Requires [RubyMotion](http://www.rubymotion.com/download/) to build for yourself.
 
 Caveats
 ---
