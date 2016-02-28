@@ -5,7 +5,7 @@ class ModLibrary
   end
 
   def all
-    get_mod_name_list.sort.map do |name|
+    AvailableMods.new.all.sort.map do |name|
       Mod.new name: name, enabled: installed_mods.include?(name)
     end
   end
@@ -21,34 +21,25 @@ class ModLibrary
   end
 
   def write_mods
-    NSFileManager.defaultManager.setAttributes({'NSFileImmutable' => 0}, ofItemAtPath: mod_ini_path, error: nil)
+    unlock_mod_file
     @installed_mods.sort!
-    data = @ini.og_iniFileData
-    data.write_to mod_ini_path
+    @ini.og_iniFileData.write_to mod_ini_path
+    lock_mod_file
+  end
+
+  def lock_mod_file
     NSFileManager.defaultManager.setAttributes({'NSFileImmutable' => 1}, ofItemAtPath: mod_ini_path, error: nil)
+  end
+
+  def unlock_mod_file
+    NSFileManager.defaultManager.setAttributes({'NSFileImmutable' => 0}, ofItemAtPath: mod_ini_path, error: nil)
   end
 
   def installed_mods
     @installed_mods.uniq.compact.sort
   end
 
-  def mod_root_path
-    '~/Library/Application Support/Steam/steamapps/workshop/content/268500'.stringByExpandingTildeInPath
-  end
-
   def mod_ini_path
-    '~/Library/Application Support/Feral Interactive/XCOM 2/VFS/Local/my games/XCOM2/XComGame/Config/XComModOptions.ini'.stringByExpandingTildeInPath
-  end
-
-  def get_mod_directory_list
-    NSFileManager.defaultManager.contentsOfDirectoryAtPath mod_root_path, error: nil
-  end
-
-  def get_mod_name_list
-    get_mod_directory_list.map do |directory|
-      files = NSFileManager.defaultManager.contentsOfDirectoryAtPath mod_root_path.stringByAppendingPathComponent(directory), error: nil
-      next unless files && files.any?
-      files.grep(/xcommod/i).first.split('.').first
-    end.compact
+    File.expand_path '~/Library/Application Support/Feral Interactive/XCOM 2/VFS/Local/my games/XCOM2/XComGame/Config/XComModOptions.ini'
   end
 end

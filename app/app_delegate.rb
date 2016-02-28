@@ -14,30 +14,23 @@ class AppDelegate
       menu.initWithTitle ''
 
       @library.all.each do |mod|
-        menu.addItem(NSMenuItem.new.tap do |item|
-          item.title = mod.name
-          item.action = 'clicked_menu_bar:'
-          item.setState(NSOnState) if mod.enabled
-        end)
+        menu.addItem NSMenuItem.create(title: mod.name, action: 'clicked_menu_bar:', enabled: mod.enabled)
       end
 
-      menu.addItem(NSMenuItem.new.tap do |item|
-        item.title = '---'
-      end)
-
-      menu.addItem(NSMenuItem.new.tap do |item|
-        item.title = 'Quit xc2mod manager'
-        item.action = 'terminate:'
-      end)
+      menu.addItem NSMenuItem.separatorItem
+      menu.addItem NSMenuItem.create title: "version #{version}"
+      menu.addItem NSMenuItem.create title: 'Quit xc2mod manager', action: 'terminate:'
     end
   end
 
+  def version
+    'CFBundleShortVersionString'.info_plist
+  end
+
   def clicked_menu_bar item
-    item.state = item.state == 1 ? 0 : 1
-    if item.state == 1
-      @library.enable item.title
-    else
-      @library.disable item.title
-    end
+    item.toggle!
+
+    action = item.checked? ? :enable : :disable
+    @library.send action, item.title
   end
 end
